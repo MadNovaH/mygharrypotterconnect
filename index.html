@@ -4,59 +4,111 @@
   <meta charset="UTF-8">
   <title>MYG - Poudlard RP</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Police magique -->
+  <link href="https://fonts.googleapis.com/css2?family=Uncial+Antiqua&display=swap" rel="stylesheet">
+
   <style>
     body {
       margin: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #23272a, #2c2f33);
-      color: #ffffff;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
+      padding: 0;
+      font-family: 'Uncial Antiqua', serif;
+      background: url('assets/RMK12279M.webp') no-repeat center center fixed;
+      background-size: cover;
+      color: #f5deb3;
       text-align: center;
     }
 
-    h1 {
-      font-size: 3em;
-      margin-bottom: 0.2em;
-      color: #7289da;
+    .overlay {
+      background-color: rgba(0, 0, 0, 0.7);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
     }
 
-    p {
-      font-size: 1.2em;
-      margin-bottom: 2em;
+    h1 {
+      font-size: 4em;
+      color: #e6c87b;
+      margin-bottom: 0.2em;
+      text-shadow: 2px 2px 5px #000;
+    }
+
+    .info {
+      font-size: 1.3em;
+      margin: 10px 0;
     }
 
     a.button {
+      margin-top: 2rem;
       display: inline-block;
-      padding: 15px 30px;
-      font-size: 1.2em;
-      background-color: #5865f2;
+      padding: 15px 35px;
+      font-size: 1.4em;
+      background-color: #6e4d1e;
       color: #ffffff;
-      border: none;
-      border-radius: 12px;
+      border: 2px solid #cba135;
+      border-radius: 10px;
       text-decoration: none;
-      transition: background-color 0.3s ease;
+      box-shadow: 0 0 15px #cba135;
+      transition: background-color 0.3s, transform 0.2s;
     }
 
     a.button:hover {
-      background-color: #4752c4;
+      background-color: #8e6b2f;
+      transform: scale(1.05);
     }
 
     .footer {
-      position: absolute;
-      bottom: 20px;
+      margin-top: 30px;
       font-size: 0.9em;
-      color: #aaa;
+      color: #ddd;
     }
   </style>
 </head>
 <body>
-  <h1>MYG - Poudlard RP</h1>
-  <p>Un monde magique t'attend !<br>Clique ci-dessous pour rejoindre le serveur :</p>
-  <a class="button" href="steam://connect/31.56.58.107:27501">🧙‍♂️ Appuyez pour vous connecter</a>
-  <div class="footer">Assurez-vous que Steam est ouvert avant de cliquer.</div>
+  <div class="overlay">
+    <h1>MYG - Poudlard RP</h1>
+
+    <div class="info" id="server-name">Nom du serveur : ...</div>
+    <div class="info" id="players">👥 Joueurs connectés : ...</div>
+    <div class="info" id="status">📡 Statut : ...</div>
+    <div class="info" id="uptime">⏱️ Uptime : ...</div>
+
+    <a class="button" href="steam://connect/31.56.58.107:27501">
+      ✨ Appuyez pour vous connecter
+    </a>
+
+    <div class="footer">Assurez-vous que Steam est ouvert avant de cliquer.</div>
+  </div>
+
+  <script>
+    fetch("https://api.battlemetrics.com/servers/33697484")
+      .then(res => res.json())
+      .then(data => {
+        const server = data.data.attributes;
+
+        document.getElementById("server-name").innerText = "Nom du serveur : " + server.name;
+        document.getElementById("players").innerText = `👥 Joueurs connectés : ${server.players} / ${server.maxPlayers}`;
+        document.getElementById("status").innerText = `📡 Statut : ${server.status === "online" ? "🟢 En ligne" : "🔴 Hors ligne"}`;
+
+        const timeUp = server.details.uptime || 0;
+        const minutes = Math.floor(timeUp / 60);
+        const hours = Math.floor(minutes / 60);
+        const days = Math.floor(hours / 24);
+        const uptimeStr = days > 0
+          ? `${days}j ${hours % 24}h ${minutes % 60}m`
+          : `${hours}h ${minutes % 60}m`;
+
+        document.getElementById("uptime").innerText = `⏱️ Uptime : ${uptimeStr}`;
+      })
+      .catch(() => {
+        document.getElementById("server-name").innerText = "Impossible de charger les données.";
+        document.getElementById("players").innerText = "";
+        document.getElementById("status").innerText = "Statut : 🔴 Hors ligne";
+        document.getElementById("uptime").innerText = "";
+      });
+  </script>
 </body>
 </html>
